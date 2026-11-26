@@ -1,0 +1,172 @@
+<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>BASS CHAOS V2 PRO</title><style>
+*{box-sizing:border-box}body{margin:0;background:#07070f;color:#fff;font-family:system-ui,Arial}header{position:sticky;top:0;z-index:9;background:#111126;padding:12px;border-bottom:3px solid #ff2d95}
+h1{margin:0;font-size:26px}h1 span{color:#00f0ff}button{border:0;border-radius:14px;padding:14px 10px;font-weight:800;cursor:pointer;color:#fff;background:#26264a;min-height:56px;font-size:15px}
+button:active{transform:scale(.96)}input,select{padding:12px;border-radius:12px;border:1px solid #444;background:#1a1a2e;color:#fff;width:100%;font-size:16px}
+.wrap{max-width:1200px;margin:auto;padding:12px}.card{background:#14142a;border:1px solid #333;border-radius:18px;padding:14px;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.grid button{min-height:64px}
+.pink{background:#ff2d95}.cyan{background:#00a8c5}.lime{background:#5aa800}.orange{background:#e86a00}.purple{background:#7a2dff}.red{background:#d92b2b}.gold{background:#b88600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1;min-width:140px}label{font-size:13px;color:#bbb;display:block;margin:8px 0 4px}
+.decks{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.decks{grid-template-columns:1fr}}
+.vinyl{width:120px;height:120px;border-radius:50%;background:repeating-radial-gradient(circle,#111 0 3px,#222 3px 6px);margin:10px auto;display:flex;align-items:center;justify-content:center;border:4px solid #ff2d95}
+.vinyl.playing{animation:spin 2s linear infinite}.vinyl .hole{width:34px;height:34px;border-radius:50%;background:#ff2d95}
+@keyframes spin{to{transform:rotate(360deg)}}.step{display:grid;grid-template-columns:70px repeat(16,1fr);gap:4px;align-items:center;margin:6px 0}
+.step button{padding:0;min-height:38px;background:#2a2a4d}.step button.on{background:#ff2d95}.step button:nth-child(5),.step button:nth-child(9),.step button:nth-child(13),.step button:nth-child(17){border-left:3px solid #00f0ff}
+.piano{display:flex;gap:3px;flex-wrap:wrap}.piano button{flex:1;min-width:44px;background:#fff;color:#111}.piano button.black{background:#111;color:#fff}
+.track{display:flex;gap:10px;background:#1e1e38;border-radius:14px;padding:10px;align-items:center}.track img{width:56px;height:56px;border-radius:10px;object-fit:cover;background:#333}
+.track .t{flex:1;min-width:0}.badge{display:inline-block;background:#00f0ff;color:#000;font-size:11px;font-weight:900;padding:2px 7px;border-radius:99px;margin-right:4px}
+.shake{animation:sh .18s infinite}@keyframes sh{0%{transform:translate(0)}25%{transform:translate(2px,-2px)}50%{transform:translate(-2px,2px)}100%{transform:translate(0)}}
+#viz{width:100%;height:90px;background:#000;border-radius:12px}details{margin-top:8px}
+</style></head><body><header><h1>🔊 BASS CHAOS <span>V2 PRO</span></h1><div style="font-size:13px;color:#bbb">Turntables • Drum Machine • Melodie-Studio • Voice-Recorder • Master-Rec • Track-Suche</div></header>
+<div class="wrap">
+<div class="card"><div class="row"><button class="red" onclick="stopAll()">⏹ STOP ALL</button><button class="pink" onclick="megaDrop()">💥 MEGA DROP</button><button class="cyan" onclick="randomDrop()">🎲 ZUFALLS DROP</button><button class="lime" onclick="toggleRec(this)">⏺ MASTER-AUFNAHME</button><button onclick="document.body.requestFullscreen&&document.body.requestFullscreen()">⛶ VOLLBILD (Android)</button></div>
+<div id="recInfo" style="margin-top:8px;color:#ff6b9d"></div><canvas id="viz"></canvas><div class="row"><div><label>Master Volume</label><input type="range" id="masterVol" min="0" max="100" value="80"></div><div><label>BPM <b id="bpmOut">140</b></label><input type="range" id="bpm" min="70" max="200" value="140"></div><div><label>Bass Boost</label><input type="range" id="bassBoost" min="0" max="100" value="60"></div><div><label>Pitch ±12</label><input type="range" id="pitch" min="-12" max="12" value="0"></div><div><label>Reverb</label><input type="range" id="reverb" min="0" max="100" value="20"></div></div>
+<div class="row"><button onclick="preset('CLUB')">CLUB</button><button onclick="preset('RAVE')">RAVE</button><button onclick="preset('HARDSTYLE')">HARDSTYLE</button><button onclick="preset('PHONK')">PHONK</button><button onclick="preset('MONSTER')">MONSTER BASS</button><button onclick="preset('CLEAN')">CLEAN</button></div></div>
+
+<!-- TRACK SUCHE -->
+<div class="card"><h2>🎵 TRACK-SUCHE — Deezer / iTunes / Internet Archive / FMA</h2>
+<div class="row"><input id="q" placeholder="z.B. Techno, Hardstyle, Phonk..." value="Techno"><button class="cyan" onclick="searchTracks()">SUCHEN 🔍</button></div>
+<div class="row" style="margin-top:8px"><button onclick="quickSearch('Techno')">Techno</button><button onclick="quickSearch('Hardstyle')">Hardstyle</button><button onclick="quickSearch('Phonk')">Phonk</button><button onclick="quickSearch('House')">House</button><button onclick="quickSearch('Dubstep')">Dubstep</button><button onclick="quickSearch('LoFi')">LoFi</button></div>
+<div style="margin-top:8px"><label>Quellen (Mehrfach):</label><div class="row"><label><input type="checkbox" class="src" value="deezer" checked> Deezer (30s)</label><label><input type="checkbox" class="src" value="itunes" checked> iTunes (30s)</label><label><input type="checkbox" class="src" value="archive" checked> Internet Archive (Full, CC)</label><label><input type="checkbox" class="src" value="fma" checked> FMA (Link)</label></div></div>
+<div id="searchStatus" style="margin-top:8px;color:#00f0ff"></div><div id="results" class="grid" style="margin-top:10px"></div>
+<p style="font-size:12px;color:#aaa">Deezer/iTunes = nur 30-Sek-Previews. Archive/FMA = CC / Public Domain, Lizenz je Track prüfen. Keine Chart-Full-Tracks ohne Lizenz. Backend: <code>GET /api/search?q=techno&amp;sources=deezer,itunes,archive,fma</code></p>
+<div class="row"><button onclick="curated('collection:netlabels AND mediatype:audio')">CC RAVE STARTER (Archive)</button><button onclick="curated('lofi AND mediatype:audio')">LOFI CC CHILL</button><button onclick="curated('electronic AND mediatype:audio')">ELECTRONIC CC</button></div></div>
+
+<!-- TURNTABLES -->
+<div class="card"><h2>🎛️ 2 PRO TURNTABLES</h2><div class="decks">
+<div class="card" style="margin:0"><h3>DECK A</h3><div class="vinyl" id="vinylA"><div class="hole"></div></div><div id="deckAInfo"><b>Kein Track geladen</b><br><small>Synth-Beat bereit</small></div>
+<audio id="audioA" preload="none"></audio><div class="row"><button class="lime" onclick="playDeck('A')">▶ PLAY</button><button onclick="pauseDeck('A')">⏸ PAUSE</button><button onclick="cueDeck('A')">⏮ CUE</button></div>
+<label>Pitch / Tempo</label><input type="range" id="pitchA" min="80" max="120" value="100" oninput="setDeckRate('A',this.value)"><label>Volume Deck A</label><input type="range" id="volA" min="0" max="100" value="80" oninput="setDeckVol('A',this.value)"><button onclick="scratch('A')">🎧 SCRATCH!</button></div>
+<div class="card" style="margin:0"><h3>DECK B</h3><div class="vinyl" id="vinylB"><div class="hole"></div></div><div id="deckBInfo"><b>Kein Track geladen</b><br><small>Synth-Beat bereit</small></div>
+<audio id="audioB" preload="none"></audio><div class="row"><button class="lime" onclick="playDeck('B')">▶ PLAY</button><button onclick="pauseDeck('B')">⏸ PAUSE</button><button onclick="cueDeck('B')">⏮ CUE</button></div>
+<label>Pitch / Tempo</label><input type="range" id="pitchB" min="80" max="120" value="100" oninput="setDeckRate('B',this.value)"><label>Volume Deck B</label><input type="range" id="volB" min="0" max="100" value="80" oninput="setDeckVol('B',this.value)"><button onclick="scratch('B')">🎧 SCRATCH!</button></div>
+</div><label>🎚️ CROSSFADER A ↔ B</label><input type="range" id="cross" min="0" max="100" value="50" oninput="applyCross()"><div class="row"><button onclick="syncDecks()">🔄 SYNC BPM</button><button onclick="loadSynth('A')">Synth-Beat → A</button><button onclick="loadSynth('B')">Synth-Beat → B</button></div></div>
+
+<div id="sections"></div>
+
+<!-- DRUM MACHINE -->
+<div class="card"><h2>🥁 DRUM MACHINE — 16-Step</h2><div class="row"><button class="lime" onclick="toggleDrums()">▶ / ⏸ DRUMS</button><button onclick="randomDrums()">🎲 RANDOM</button><button onclick="clearDrums()">🗑 CLEAR</button><button onclick="drumPreset('techno')">Techno</button><button onclick="drumPreset('trap')">Trap</button><button onclick="drumPreset('house')">House</button><button onclick="drumPreset('phonk')">Phonk</button></div>
+<label>Swing</label><input type="range" id="swing" min="0" max="60" value="10"><div id="drumGrid"></div><p style="font-size:13px">Tippe auf die Steps, um sie an/aus zu schalten. Läuft im BPM oben.</p></div>
+
+<!-- MELODIE STUDIO -->
+<div class="card"><h2>🎹 MELODIE-STUDIO</h2><div class="row"><select id="instrument"><option value="piano">🎹 Klavier</option><option value="flute">🪈 Querflöte</option><option value="synth">🎛️ Synth</option><option value="organ">🎹 Orgel</option><option value="guitar">🎸 Gitarre</option><option value="violin">🎻 Violine</option><option value="sax">🎷 Sax</option><option value="marimba">🥁 Marimba</option></select><input id="melName" placeholder="Melodie-Name, z.B. Mein Rave"><button class="cyan" onclick="saveMelody()">💾 SPEICHERN</button><button class="lime" onclick="playMelodySeq()">▶ MELODIE SPIELEN</button></div>
+<div class="piano" id="pianoKeys"></div><p style="font-size:13px">Taste tippen = Note spielen + in Sequenz aufnehmen (16 Steps, klicke dann Play). Sequenz: <span id="seqOut">—</span></p><div id="savedMelodies"></div></div>
+
+<!-- VOICES -->
+<div class="card"><h2>🎤 MEINE VOICES & HANDY-STUDIO</h2><p style="font-size:14px"><b>Handy verbinden (Android):</b> 1) Diese Seite auf dem Handy/Tablet in Chrome öffnen 2) Mikro erlauben 3) Aufnehmen — Voices landen hier im Board.</p>
+<div class="row"><button class="red" onclick="startVoiceRec()">⏺ AUFNEHMEN (3-2-1)</button><button onclick="stopVoiceRec()">⏹ STOP</button><select id="voiceFx"><option value="1">Normal</option><option value="1.6">Chipmunk</option><option value="0.7">Deep Voice</option><option value="0.5">Monster</option></select></div>
+<div id="voiceStatus"></div><div id="myVoices" class="grid" style="margin-top:10px"></div><div class="row" style="margin-top:10px"><button onclick="location.reload()">🔄 Seite neu laden = Handy als Fernbedienung</button></div></div>
+
+<!-- PRO TOP 10 -->
+<div class="card"><h2>🏆 PRO DJ TOP 10 — Viral-Features</h2><div class="grid">
+<button onclick="sayIt('Achtung, gleich kommt der Drop! Drei, zwei, eins!')">1. VIRAL DROP COUNTDOWN 3-2-1</button><button onclick="hypeMeter()">2. CROWD HYPE METER 📈</button><button onclick="tiktokHook()">3. TIKTOK HOOK (15s)</button><button onclick="doubleDrop()">4. DOUBLE DROP 💥💥</button><button onclick="echoOut()">5. ECHO OUT</button><button onclick="filterSweep()">6. FILTER SWEEP</button><button onclick="loopRoll()">7. LOOP ROLL</button><button onclick="beatJump()">8. BEAT JUMP</button><button onclick="hotCue()">9. HOT CUE 🔥</button><button onclick="playSampler()">10. SAMPLER / ONE-SHOTS</button>
+</div><div id="hypeOut" style="margin-top:10px;font-size:20px"></div></div>
+<p style="text-align:center;color:#666;font-size:12px">BASS CHAOS V2 PRO • Backend: Flask • /api/search • /health • CC-Lizenzen beachten</p></div>
+
+<script>
+let AC, master, analyser, masterDest, mediaRec, chunks=[], isRec=false, drumTimer=null, stepIdx=0, seq=[], deckNodes={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function audio(){if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.8;analyser=AC.createAnalyser();master.connect(analyser);analyser.connect(AC.destination);masterDest=AC.createMediaStreamDestination();master.connect(masterDest);drawViz();}if(AC.state==='suspended')AC.resume();return AC;}
+function drawViz(){const c=$('viz'),x=c.getContext('2d'),d=new Uint8Array(analyser.frequencyBinCount);(function f(){requestAnimationFrame(f);analyser.getByteFrequencyData(d);x.fillStyle='#000';x.fillRect(0,0,c.width,c.height);for(let i=0;i<70;i++){x.fillStyle=i%3?'#ff2d95':'#00f0ff';x.fillRect(i*5,c.height-d[i]/2,4,d[i]/2);}})();}
+function tone(f,t=.4,type='sine',v=.4,slide=null){audio();let o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;if(slide)o.frequency.exponentialRampToValueAtTime(slide,AC.currentTime+t);g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t);o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+t);}
+function noise(t=.5,v=.3){audio();let b=AC.createBuffer(1,AC.sampleRate*t,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;let s=AC.createBufferSource(),g=AC.createGain();s.buffer=b;g.gain.value=v;s.connect(g);g.connect(master);s.start();}
+function kick(t=0){audio();let o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(150,AC.currentTime+t);o.frequency.exponentialRampToValueAtTime(35,AC.currentTime+t+.18);g.gain.setValueAtTime(.9,AC.currentTime+t);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t+.25);o.connect(g);g.connect(master);o.start(AC.currentTime+t);o.stop(AC.currentTime+t+.3);}
+function sayIt(txt){try{let u=new SpeechSynthesisUtterance(txt);u.lang='de-DE';u.rate=1.05;speechSynthesis.cancel();speechSynthesis.speak(u);}catch(e){alert(txt);}}
+function shake(){document.body.classList.add('shake');setTimeout(()=>document.body.classList.remove('shake'),600);}
+function stopAll(){if(AC){AC.suspend();AC.resume();}document.querySelectorAll('audio').forEach(a=>a.pause());speechSynthesis&&speechSynthesis.cancel();stopDrums();}
+// --- SOUND SEKTIONEN (doppelt so viel) ---
+const SECTIONS=[
+["🚨 SIRENEN (24)",["Polizei","Feuerwehr","Ambulanz","Air Raid","Rave Sirene","Dub Sirene","Laser Sirene","Tornado","Purge","NATO","U-Boot","Alien","Neon","Cyberpunk","Festival","Wobble","Rising","Falling","Kirmes","Alarm 808","Siren Drop","Siren Loop","Mega Siren","Siren Alarm"]],
+["🔊 BASS-ARTEN (28)",["Sub 30Hz","Sub 40Hz","Sub 50Hz","Reece","Wobble","Growl","808","Donk","Hardstyle Bass","Dubstep Wobble","Neuro","Acid","FM","Super Saw","Hoover","Metal","Dirty","Clean Sub","Rave Bass","Phonk Bass","Trap 808","Bassline","Deep House","Techno Bass","Jersey Bass","Amapiano Bass","Bass Drop","Bass Cannon"]],
+["🌋 SEHR TIEFE BASS BEATS (20)",["Earthquake","Sub Drop","Bass Cannon","Low Rider","Tsunami","Black Hole","Underground","Rumble","25Hz Test","Bassquake","Eruption","Magma","Abyss","Tiefsee","Godzilla","Vulkan","Donner Bass","Keller Bass","Bunker","Weltuntergang"]],
+["🥁 BEATS (24)",["Techno 140","Hardstyle","Dubstep","Trap","House","DnB","Phonk","Jersey Club","Hardcore","UK Garage","Baile Funk","Afro House","Amapiano","Ghetto House","Speed House","Eurodance","Trance","Schranz","Happy Hardcore","Gabber","Hard Techno","Minimal","Deep House","Future Bass"]],
+["🎹 MELODIEN (24)",["Rave Melodie","Hardstyle Melodie","Happy Hardcore","Trance","Phonk Melodie","Techno Arp","Euphoric","Dark","Retro Game","Arabian","Epic","Kinder-Rave","Kirmes","Schlager-Rave","Balkan","Cyber","Neon Nights","Sonnenaufgang","Mitternacht","Festival Hymne","Bass Hymne","Dream","Galaxy","Stadion"]],
+["✨ FX (32)",["Riser","Downlifter","Noise Sweep","Vinyl Stop","Rewind","Laser","Explosion","Glass Break","Thunder","Police Radio","Crowd Cheer","Boo","Scratch","Glitch","Robot","Echo Drop","Backspin","Echo Freeze","Airhorn Remix","Siren FX","Whoosh","Impact","Risiko","Alarm FX","Teleport","Warp","Freeze","Stutter","Reverse","Tape Stop","Megaphon","Laser Show"]],
+["🎤 VOICE / RUFE (28)",["Mach mal lauter!","Hände hoch!","Alle springen!","Das ist der Bass!","Nochmal!","Feuer frei!","Berlin, seid ihr da?","Let's go!","Dreht auf!","Das war erst der Anfang!","Wer hat Bock?","Achtung, Bass!","Party!","Hannover, seid ihr da?","Alle Hände in die Luft!","Noch lauter!","Das ist mein Track!","Fühlt ihr das?","Springt!","Klatscht mit!","Sing mit!","Einmal alle!","Ab geht's!","Vollgas!","Bass an!","Drop it!","Are you ready?","Let's fetz!"]],
+["😂 SPASS (28)",["Furz","Rülpser","Schrei","Katze","Hund","Kuh","Ente","Furz-Orchester","Buzzer Falsch","Ding Richtig","Applaus","Lachtrack","Wilhelm Schrei","Sad Trombone","Kasse","Mario Coin","Ziege","Huhn","Furz Bass","Kuh Glocke","Quak","Miau Mix","Wuff Beat","Hupe","Tröte","Lache","Weinen","Party Horn"]]
+];
+const secEl=$('sections');
+SECTIONS.forEach(([title,items],si)=>{let d=document.createElement('div');d.className='card';d.innerHTML='<h2>'+title+'</h2><div class="grid"></div>';let g=d.querySelector('.grid');
+items.forEach(name=>{let b=document.createElement('button');b.textContent=name;b.className=['pink','cyan','lime','orange','purple','gold'][si%6];b.onclick=()=>playNamed(si,name,b);g.appendChild(b);});secEl.appendChild(d);});
+function playNamed(si,name,b){audio();
+if(si===0){let f=600+Math.random()*400;for(let i=0;i<3;i++)tone(f+i*80,.35,'sawtooth',.25,300);}
+else if(si===1){[55,65,75,110].forEach((f,i)=>setTimeout(()=>tone(f,.5,'sine',.6,35),i*120));shake();}
+else if(si===2){tone(32,1.2,'sine',.9,25);kick();shake();}
+else if(si===3){for(let i=0;i<8;i++){setTimeout(()=>kick(),i*220);if(i%2)setTimeout(()=>noise(.05,.15),i*220+110);} }
+else if(si===4){[523,659,784,1046,784,659].forEach((f,i)=>setTimeout(()=>tone(f,.3,'square',.2),i*160));}
+else if(si===5){if(name.includes('Explosion')){noise(1,.5);tone(40,1,'sine',.8);}else if(name.includes('Laser'))tone(2000,.3,'sawtooth',.3,200);else noise(.4,.3);}
+else if(si===6){sayIt(name);}
+else {if(name==='Furz'||name.includes('Furz')){tone(90,.5,'sawtooth',.5,45);}else if(name==='Katze'||name.includes('Miau'))sayIt('Miau, miau!');else if(name==='Hund'||name.includes('Wuff'))sayIt('Wuff wuff!');else if(name==='Kuh')sayIt('Muhhh!');else if(name==='Ente'||name.includes('Quak'))sayIt('Quak quak!');else if(name.includes('Applaus')){for(let i=0;i<12;i++)setTimeout(()=>noise(.08,.25),i*90);}else if(name.includes('Kasse')){tone(1200,.15,'square',.3);tone(1600,.3,'square',.3);}else sayIt(name);}
+}
+function megaDrop(){sayIt('Achtung, Mega Drop!');setTimeout(()=>{tone(35,1.5,'sine',.9,28);kick();noise(.8,.3);shake();},500);}
+function randomDrop(){let s=SECTIONS[Math.floor(Math.random()*SECTIONS.length)];let n=s[1][Math.floor(Math.random()*s[1].length)];playNamed(SECTIONS.indexOf(s),n);}
+function preset(p){let m={CLUB:[80,140,50,0,15],RAVE:[90,150,70,2,30],HARDSTYLE:[95,150,90,0,10],PHONK:[85,140,80,-2,25],MONSTER:[100,130,100,0,5],CLEAN:[70,128,20,0,0]}[p];if(!m)return;$('masterVol').value=m[0];$('bpm').value=m[1];$('bpmOut').textContent=m[1];$('bassBoost').value=m[2];$('pitch').value=m[3];$('reverb').value=m[4];}
+$('bpm').oninput=e=>$('bpmOut').textContent=e.target.value;
+function hypeMeter(){let v=Math.floor(Math.random()*60)+40;$('hypeOut').textContent='🔥 HYPE: '+v+'% '+('🔥'.repeat(Math.floor(v/20)));sayIt('Der Hype ist bei '+v+' Prozent!');}
+function tiktokHook(){sayIt('Drei, zwei, eins - Hook!');setTimeout(()=>megaDrop(),1200);}
+function doubleDrop(){megaDrop();setTimeout(megaDrop,900);}
+function echoOut(){tone(440,.8,'sine',.3);setTimeout(()=>tone(440,.8,'sine',.2),300);setTimeout(()=>tone(440,.8,'sine',.1),600);}
+function filterSweep(){tone(200,1.2,'sawtooth',.3,4000);}
+function loopRoll(){for(let i=0;i<6;i++)setTimeout(()=>kick(),i*110);}
+function beatJump(){kick();setTimeout(()=>kick(),80);setTimeout(()=>kick(),160);}
+function hotCue(){tone(880,.2,'square',.4);sayIt('Hot Cue!');}
+function playSampler(){[523,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,.25,'square',.3),i*130));}
+// --- TRACK SUCHE via Backend ---
+async function searchTracks(){let q=$('q').value.trim()||'Techno';let srcs=[...document.querySelectorAll('.src:checked')].map(e=>e.value).join(',');$('searchStatus').textContent='Suche läuft...';try{let r=await fetch('/api/search?q='+encodeURIComponent(q)+'&sources='+encodeURIComponent(srcs));let j=await r.json();renderResults(j.results||[]);$('searchStatus').textContent=j.count+' Treffer • Fehler: '+JSON.stringify(j.errors||{});}catch(e){$('searchStatus').textContent='Backend nicht erreichbar. Lokal: python app.py starten. Fehler: '+e;}}
+function quickSearch(t){$('q').value=t;searchTracks();}
+function curated(q){$('q').value=q;searchTracks();}
+function renderResults(list){let el=$('results');el.innerHTML='';if(!list.length)el.innerHTML='<p>Keine Treffer. Anderen Begriff versuchen.</p>';list.forEach(t=>{let d=document.createElement('div');d.className='track';d.innerHTML='<img src="'+esc(t.cover)+'" onerror="this.style.display=\'none\'"><div class="t"><span class="badge">'+esc(t.source)+'</span><span class="badge">'+esc(t.license)+'</span><br><b>'+esc(t.title||'?')+'</b><br><small>'+esc(t.artist)+' • '+esc(t.duration||'?')+'s</small></div>';
+if(t.is_search_link){let o=document.createElement('button');o.textContent='↗ FMA ÖFFNEN';o.onclick=()=>window.open(t.link,'_blank','noopener');d.append(o);el.appendChild(d);return;}
+let p=document.createElement('button');p.textContent='▶ PLAY';p.onclick=()=>previewAudio(t);
+let a=document.createElement('button');a.textContent='→ DECK A';a.onclick=()=>loadToDeck('A',t);
+let b=document.createElement('button');b.textContent='→ DECK B';b.onclick=()=>loadToDeck('B',t);
+let f=document.createElement('button');f.textContent='❤️';f.onclick=()=>fav(t);
+d.append(p,a,b,f);el.appendChild(d);});}
+let previewEl=new Audio();
+function setStatus(m){$('searchStatus').textContent=m;}
+async function trackUrl(t){let u=t.preview;if(!u&&t.identifier){let r=await fetch('/api/archive-file/'+encodeURIComponent(t.identifier));let j=await r.json();if(!j.url)throw new Error(j.error||'keine MP3 gefunden');u=j.url;}if(!u)throw new Error('kein Audio');return '/api/audio?url='+encodeURIComponent(u);}
+async function previewAudio(t){try{setStatus('Lade Vorschau…');previewEl.src=await trackUrl(t);await previewEl.play();setStatus('▶ '+(t.title||''));}catch(e){setStatus('Vorschau-Fehler: '+e.message);}}
+function connectDeck(d){audio();if(deckNodes[d])return;try{let s=AC.createMediaElementSource($('audio'+d));s.connect(master);deckNodes[d]=s;}catch(e){}}
+async function loadToDeck(deck,t){let info=$('deck'+deck+'Info');info.innerHTML='<b>'+esc(t.title)+'</b><br><small>'+esc(t.artist)+' • '+esc(t.source)+'</small><br><img src="'+esc(t.cover)+'" style="width:80px;border-radius:10px;margin-top:6px">';let aud=$('audio'+deck);try{setStatus('Lade in Deck '+deck+'…');aud.src=await trackUrl(t);connectDeck(deck);await aud.play();$('vinyl'+deck).classList.add('playing');applyCross();saveFav(t);setStatus('✅ Deck '+deck+': '+(t.title||''));}catch(e){setStatus('Deck-Fehler: '+e.message);}}
+function playDeck(d){let a=$('audio'+d);if(a.src){a.play();$('vinyl'+d).classList.add('playing');}else{for(let i=0;i<4;i++)setTimeout(()=>kick(),i*250);$('vinyl'+d).classList.add('playing');}}
+function pauseDeck(d){$('audio'+d).pause();$('vinyl'+d).classList.remove('playing');}
+function cueDeck(d){let a=$('audio'+d);a.currentTime=0;a.pause();$('vinyl'+d).classList.remove('playing');}
+function setDeckRate(d,v){$('audio'+d).playbackRate=v/100;}
+function setDeckVol(d,v){$('audio'+d).volume=v/100;applyCross();}
+function applyCross(){let c=+$('cross').value/100;let va=+$('volA').value/100, vb=+$('volB').value/100;$('audioA').volume=va*(1-c);$('audioB').volume=vb*c;}
+function syncDecks(){let b=$('bpm').value;$('pitchA').value=100;$('pitchB').value=100;setDeckRate('A',100);setDeckRate('B',100);sayIt('Decks synchronisiert auf '+b+' BPM');}
+function loadSynth(d){$('deck'+d+'Info').innerHTML='<b>Synth-Beat</b><br><small>BPM '+$('bpm').value+'</small>';playDeck(d);}
+function scratch(d){for(let i=0;i<5;i++)setTimeout(()=>tone(900+Math.random()*800,.08,'sawtooth',.25,300),i*70);}
+function fav(t){saveFav(t);alert('Favorit gespeichert: '+(t.title||''));}
+function saveFav(t){let f=JSON.parse(localStorage.getItem('bc_favs')||'[]');f.unshift(t);localStorage.setItem('bc_favs',JSON.stringify(f.slice(0,50)));}
+// --- DRUMS ---
+const DRUMS=[['Kick',.9],['Snare',.6],['Clap',.5],['HiHat',.3],['Open Hat',.35],['808',.7],['Tom',.5],['Crash',.4]];
+let patterns={};DRUMS.forEach(([n])=>patterns[n]=Array(16).fill(0));patterns['Kick'][0]=patterns['Kick'][4]=patterns['Kick'][8]=patterns['Kick'][12]=1;patterns['HiHat'].fill(1);
+function renderDrums(){let g=$('drumGrid');g.innerHTML='';DRUMS.forEach(([n])=>{let row=document.createElement('div');row.className='step';row.innerHTML='<b style="font-size:12px">'+n+'</b>';for(let i=0;i<16;i++){let b=document.createElement('button');b.textContent=i+1;if(patterns[n][i])b.classList.add('on');b.onclick=()=>{patterns[n][i]=patterns[n][i]?0:1;b.classList.toggle('on');};row.appendChild(b);}g.appendChild(row);});}
+renderDrums();
+function drumTick(){let bpm=+$('bpm').value, stepDur=60000/bpm/4;DRUMS.forEach(([n])=>{if(patterns[n][stepIdx]){if(n==='Kick')kick();else if(n==='Snare')noise(.12,.35);else if(n==='Clap')noise(.15,.3);else if(n==='HiHat')noise(.04,.2);else if(n==='808')tone(50,.4,'sine',.7,35);else if(n==='Tom')tone(150,.25,'sine',.4,80);else noise(.5,.3);}});stepIdx=(stepIdx+1)%16;}
+function toggleDrums(){if(drumTimer){stopDrums();return;}stepIdx=0;drumTimer=setInterval(drumTick,60000/+$('bpm').value/4);}
+function stopDrums(){clearInterval(drumTimer);drumTimer=null;}
+function randomDrums(){DRUMS.forEach(([n])=>patterns[n]=patterns[n].map(()=>Math.random()>.6?1:0));renderDrums();}
+function clearDrums(){DRUMS.forEach(([n])=>patterns[n]=Array(16).fill(0));renderDrums();}
+function drumPreset(p){clearDrums();if(p==='techno'){patterns['Kick']=[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0];patterns['HiHat'].fill(1);}if(p==='trap'){patterns['Kick'][0]=patterns['Kick'][7]=patterns['Kick'][10]=1;patterns['Snare'][4]=patterns['Snare'][12]=1;}if(p==='house'){patterns['Kick']=[1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0];patterns['Clap'][4]=patterns['Clap'][12]=1;}if(p==='phonk'){patterns['Kick'][0]=patterns['Kick'][6]=patterns['Kick'][8]=patterns['Kick'][14]=1;patterns['Snare'][4]=patterns['Snare'][12]=1;}renderDrums();}
+// --- MELODIE ---
+const NOTES=[['C4',261.6],['D4',293.7],['E4',329.6],['F4',349.2],['G4',392],['A4',440],['B4',493.9],['C5',523.3],['D5',587.3],['E5',659.3],['F5',698.5],['G5',784],['A5',880],['B5',987.8],['C6',1046.5]];
+NOTES.forEach(([n,f])=>{let b=document.createElement('button');b.textContent=n;b.onclick=()=>{playNote(f);seq.push(n);if(seq.length>16)seq.shift();$('seqOut').textContent=seq.join(' ');};$('pianoKeys').appendChild(b);});
+function playNote(f){audio();let inst=$('instrument').value;let type={piano:'triangle',flute:'sine',synth:'square',organ:'sawtooth',guitar:'triangle',violin:'sawtooth',sax:'sawtooth',marimba:'sine'}[inst];tone(f,.5,type,.35);if(inst==='flute')tone(f*2,.3,'sine',.1);}
+function playMelodySeq(){let map=Object.fromEntries(NOTES);seq.forEach((n,i)=>setTimeout(()=>playNote(map[n]||440),i*180));}
+function saveMelody(){let name=$('melName').value||('Melodie '+(Date.now()%1000));let all=JSON.parse(localStorage.getItem('bc_melodies')||'[]');all.push({name,seq:[...seq],inst:$('instrument').value});localStorage.setItem('bc_melodies',JSON.stringify(all));renderMelodies();}
+function renderMelodies(){let all=JSON.parse(localStorage.getItem('bc_melodies')||'[]');$('savedMelodies').innerHTML=all.map((m,i)=>'<div class="row" style="margin:6px 0"><b>'+m.name+'</b><span>'+m.seq.join(' ')+'</span><button onclick="playSaved('+i+')">▶</button><button onclick="delSaved('+i+')">🗑</button></div>').join('')||'<p style="color:#888">Noch keine gespeicherten Melodien.</p>';}
+function playSaved(i){let all=JSON.parse(localStorage.getItem('bc_melodies')||'[]');let m=all[i];if(!m)return;$('instrument').value=m.inst||'piano';seq=[...m.seq];$('seqOut').textContent=seq.join(' ');playMelodySeq();}
+function delSaved(i){let all=JSON.parse(localStorage.getItem('bc_melodies')||'[]');all.splice(i,1);localStorage.setItem('bc_melodies',JSON.stringify(all));renderMelodies();}
+renderMelodies();
+// --- VOICE REC ---
+let vRec=null,vChunks=[];
+async function startVoiceRec(){try{let s=await navigator.mediaDevices.getUserMedia({audio:true});$('voiceStatus').textContent='3... 2... 1... AUFNAHME LÄUFT 🎤';setTimeout(()=>{vRec=new MediaRecorder(s);vChunks=[];vRec.ondataavailable=e=>vChunks.push(e.data);vRec.onstop=()=>{let blob=new Blob(vChunks,{type:'audio/webm'});let url=URL.createObjectURL(blob);let name=prompt('Name für deine Voice:','Meine Voice');let all=JSON.parse(localStorage.getItem('bc_voices')||'[]');all.push({name,url});localStorage.setItem('bc_voices',JSON.stringify(all));renderVoices();$('voiceStatus').textContent='Gespeichert: '+name;};vRec.start();},1200);}catch(e){$('voiceStatus').textContent='Mikro nicht erlaubt / nicht verfügbar: '+e;}}
+function stopVoiceRec(){if(vRec&&vRec.state!=='inactive')vRec.stop();$('voiceStatus').textContent='Aufnahme gestoppt.';}
+function renderVoices(){let all=JSON.parse(localStorage.getItem('bc_voices')||'[]');$('myVoices').innerHTML='';all.forEach((v,i)=>{let b=document.createElement('button');b.textContent='🎤 '+(v.name||'Voice');b.className='gold';b.onclick=()=>{let a=new Audio(v.url);a.playbackRate=parseFloat($('voiceFx').value);a.play();};$('myVoices').appendChild(b);});}
+renderVoices();
+// --- MASTER REC ---
+function toggleRec(btn){audio();if(!isRec){chunks=[];mediaRec=new MediaRecorder(masterDest.stream);mediaRec.ondataavailable=e=>chunks.push(e.data);mediaRec.onstop=()=>{let blob=new Blob(chunks,{type:'audio/webm'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bass-chaos-master.webm';a.textContent='⬇ MASTER-AUFNAHME HERUNTERLADEN';$('recInfo').appendChild(a);};mediaRec.start();isRec=true;btn.textContent='⏹ AUFNAHME STOPPEN';$('recInfo').textContent='🔴 MASTER-AUFNAHME LÄUFT...';}else{mediaRec.stop();isRec=false;btn.textContent='⏺ MASTER-AUFNAHME';$('recInfo').textContent+=' Fertig!';}}
+</script></body></html>
